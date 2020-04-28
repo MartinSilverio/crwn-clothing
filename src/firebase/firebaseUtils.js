@@ -65,13 +65,23 @@ export const convertCollectionsSnapshotToMap = (collections) => {
   }, {});
 };
 
+//Mimicking functionality of sign-in of promise-based instead of observable
+export const getCurrentUser = () => {
+  return new Promise((resolve, reject) => {
+    const unsubscribe = auth.onAuthStateChanged((userAuth) => {
+      unsubscribe();
+      resolve(userAuth);
+    }, reject);
+  });
+};
+
 firebase.initializeApp(config);
 
 export const auth = firebase.auth();
 export const firestore = firebase.firestore();
 
-const proivder = new firebase.auth.GoogleAuthProvider();
-proivder.setCustomParameters({ prompt: 'select_account' });
-export const signInWithGoogle = () => auth.signInWithPopup(proivder);
+export const googleProivder = new firebase.auth.GoogleAuthProvider();
+googleProivder.setCustomParameters({ prompt: 'select_account' });
+export const signInWithGoogle = () => auth.signInWithPopup(googleProivder);
 
 export default firebase;
