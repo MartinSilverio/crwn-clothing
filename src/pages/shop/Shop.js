@@ -2,54 +2,50 @@ import React from 'react';
 import { Route } from 'react-router-dom';
 import { connect } from 'react-redux';
 
-import CollectionOverview from '../../components/collections-overview/CollectionsOverview';
-import CollectionPage from '../collection/CollectionPage';
-import { updateCollections } from '../../redux/shop/shopActions';
+import CollectionsOverviewContainer from '../../components/collections-overview/CollectionsOverviewContainer';
+import CollectionPageContainer from '../collection/CollectionPageContainer';
 
-import WithSpinner from '../../components/with-spinner/WithSpinner';
-
-import {
-  firestore,
-  convertCollectionsSnapshotToMap,
-} from '../../firebase/firebaseUtils';
-
-const CollectionOverviewWithSpinner = WithSpinner(CollectionOverview);
-const CollectionPageWithSpinner = WithSpinner(CollectionPage);
+import { fetchCollectionsStartAsync } from '../../redux/shop/shopActions';
 
 class Shop extends React.Component {
-  state = {
-    loading: true,
-  };
-  unsubscribeFromSnapshpt = null;
-
   componentDidMount() {
-    const { updateCollections } = this.props;
-    const collectionRef = firestore.collection('collections');
-    collectionRef.onSnapshot(async (snapshot) => {
-      const collectionsMap = convertCollectionsSnapshotToMap(snapshot);
-      console.log(collectionsMap);
-      updateCollections(collectionsMap);
-      this.setState({ loading: false });
-    });
+    // const { updateCollections } = this.props;
+    // const collectionRef = firestore.collection('collections');
+    // Promise style access to snapshot, but is not live like the observable pattern
+    // collectionRef.get().then((snapshot) => {
+    //   const collectionsMap = convertCollectionsSnapshotToMap(snapshot);
+    //   console.log(collectionsMap);
+    //   updateCollections(collectionsMap);
+    //   this.setState({ loading: false });
+    // })
+    // Fetch method for getting data
+    // fetch(
+    //   'https://firestore.googleapis.com/v1/projects/crwn-db-2976e/databases/(default)/documents/collections'
+    // )
+    //   .then((response) => response.json())
+    //   .then((collections) => console.log(collections));
+    // collectionRef.onSnapshot(async (snapshot) => {
+    //   const collectionsMap = convertCollectionsSnapshotToMap(snapshot);
+    //   console.log(collectionsMap);
+    //   updateCollections(collectionsMap);
+    //   this.setState({ loading: false });
+    // });
+    const { fetchCollectionsStartAsync } = this.props;
+    fetchCollectionsStartAsync();
   }
 
   render() {
     const { match } = this.props;
-    const { loading } = this.state;
     return (
       <div className='shop-page'>
         <Route
           exact
           path={`${match.path}`}
-          render={(props) => (
-            <CollectionOverviewWithSpinner isLoading={loading} {...props} />
-          )}
+          component={CollectionsOverviewContainer}
         />
         <Route
           path={`${match.path}/:collectionId`}
-          render={(props) => (
-            <CollectionPageWithSpinner isLoading={loading} {...props} />
-          )}
+          component={CollectionPageContainer}
         />
       </div>
     );
@@ -57,8 +53,7 @@ class Shop extends React.Component {
 }
 
 const mapDispatchToProps = (dispatch) => ({
-  updateCollections: (collectionsMap) =>
-    dispatch(updateCollections(collectionsMap)),
+  fetchCollectionsStartAsync: () => dispatch(fetchCollectionsStartAsync()),
 });
 
 export default connect(null, mapDispatchToProps)(Shop);
