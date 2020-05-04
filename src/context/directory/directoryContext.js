@@ -1,3 +1,5 @@
+import { createContext } from 'react';
+
 const INITIAL_STATE = {
   sections: [
     {
@@ -35,11 +37,6 @@ const INITIAL_STATE = {
   ],
 };
 
-const directoryReducer = (state = INITIAL_STATE, action) => {
-  switch (action.type) {
-    default:
-      return state;
-  }
-};
+const DirectoryContext = createContext(INITIAL_STATE);
 
-export default directoryReducer;
+export default DirectoryContext;

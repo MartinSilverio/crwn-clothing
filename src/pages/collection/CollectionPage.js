@@ -1,12 +1,13 @@
-import React from 'react';
-import { connect } from 'react-redux';
+import React, { useContext } from 'react';
 
 import CollectionItem from '../../components/collection-item/CollectionItem';
-import { selectCollection } from '../../redux/shop/shopSelectors';
+import CollectionsContext from '../../context/collections/collectionsContext';
 
 import './CollectionPage.scss';
 
-function CollectionPage({ collection }) {
+function CollectionPage({ match }) {
+  const collections = useContext(CollectionsContext);
+  const collection = collections[match.params.collectionId];
   const { title, items } = collection;
   return (
     <div className='collection-page'>
@@ -20,8 +21,4 @@ function CollectionPage({ collection }) {
   );
 }
 
-const mapStateToProps = (state, ownProps) => ({
-  collection: selectCollection(ownProps.match.params.collectionId)(state),
-});
-
-export default connect(mapStateToProps)(CollectionPage);
+export default CollectionPage;
